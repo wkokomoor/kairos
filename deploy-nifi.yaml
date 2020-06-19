@@ -1,31 +1,30 @@
 apiVersion: 2018-10-01
 location: eastus
-name: nifiGroup
+name: wpskairos
 properties:
-  containers:
-  - name: nifi-01
-    properties:
-        environmentVariables: []
-        image: wpskairos.azurecr.io/nifi:latest
-        resources:
-            requests:
-            cpu: 1
-            memoryInGb: 1.5
-        ports:
-        - port: 8080
-        volumeMounts:
-        - mountPath: /opt/nifi/nifi-current/conf
-            name: nificonf
-
+    containers:
+    -   name: nifi-01
+        properties:
+            environmentVariables: []
+            image: wpskairos.azurecr.io/nifi:latest
+            resources:
+                requests:
+                    cpu: 1
+                    memoryInGb: 1.5
+            ports:
+                -   port: 8080
+            volumeMounts:
+                -   mountPath: /opt/nifi/nifi-current/conf
+                    name: nificonf
     osType: Linux
     ipAddress:
         type: Public
         ports:
-        - protocol: tcp
+        -   protocol: tcp
             port: 8080
     volumes:
-    - name: nificonf
-        azureFile:
+    -   name: nificonf
+        azureFile: 
             sharename: nificonf
             storageAccountName: kairosappdata
             storageAccountKey: 3XjRCZr8PXR+StBVVcsMWRYYlIyIyluKW8EIOJCosYgCNdc755rmhy1XQ3vhU5bfnE4vzT6fTTfMhrMXigxWgg==

@@ -1,0 +1,85 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "storageLogin": {
+            "type": "string"
+        },
+        "storagePassword": {
+            "type": "securestring"
+        },
+        "registryLogin": {
+            "type": "string"
+        },
+        "registryPassword": {
+            "type": "securestring"
+        }
+    },
+    "variables": {},
+    "resources": [{
+        "name": "nifi",
+        "type": "Microsoft.ContainerInstance/containerGroups",
+        "apiVersion": "2018-10-01",
+        "location": "",
+        "tags": {},
+        "properties": {
+            "containers": [
+            {
+                "name": "nifi01",
+                "properties": {
+                    "image": "wpskairos.azurecr.io/nifi:latest",
+                    "command": [],
+                    "ports": [
+                    {
+                        "protocol": "TCP",
+                        "port": 8080
+                    }
+                    ],
+                    "environmentVariables": [],
+                    "resources": {
+                        "requests": {
+                            "memoryInGB": 1.5,
+                            "cpu": 1
+                        },
+                        "limits": {}
+                    },
+                    "volumeMounts": [
+                    {
+                        "name": "nificonf",
+                        "mountPath": "/opt/nifi/nifi-current/conf"
+                    }
+                    ]
+                }
+            }
+            ],
+            "imageRegistryCredentials": [
+            {
+                "server": "wpskairos.azurecr.io",
+                "username": "[parameters('registryLogin')]",
+                "password": "[parameters('registryPassword')]"
+            }
+            ],
+            "restartPolicy": "Never",
+            "ipAddress": {
+                "ports": [
+                {
+                    "protocol": "TCP",
+                    "port": 8080
+                }
+                ],
+                "type": "Public"
+                },
+            "osType": "Linux",
+            "volumes": [
+            {
+                "name": "nificonf",
+                "azureFile": {
+                    "shareName": "nificonf",
+                    "storageAccountName": "[parameters('storageLogin')]",
+                    "storageAccountKey": "[parameters('storagePassword')]"
+                }
+            }
+            ]
+        }
+    }]
+}
