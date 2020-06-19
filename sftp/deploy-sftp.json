@@ -1,0 +1,93 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "name": {
+            "defaultValue": "sftp",
+            "type": "string"
+        },
+        "registryLogin": {
+            "type": "string"
+        },
+        "registryPassword": {
+            "type": "securestring"
+        },
+        "storagePassword": {
+            "type": "securestring"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.ContainerInstance/containerGroups",
+            "apiVersion": "2018-10-01",
+            "name": "[parameters('name')]",
+            "location": "eastus",
+            "properties": {
+                "containers": [
+                    {
+                        "name": "sftp",
+                        "properties": {
+                            "image": "wpskairos.azurecr.io/sftp:latest",
+                            "ports": [
+                                {
+                                    "port": 22
+                                }
+                            ],
+                            "environmentVariables": [
+                                {
+                                    "name": "SFTP_USERS",
+                                    "value": "kairossftp:kairossftp:1001"
+                                }
+                            ],
+                            "resources": {
+                                "requests": {
+                                    "memoryInGB": 1,
+                                    "cpu": 2
+                                }
+                            },
+                            "volumeMounts": [
+                                {
+                                    "name": "sftpvolume",
+                                    "mountPath": "/home/kairossftp/upload",
+                                    "readOnly": false
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "imageRegistryCredentials": [
+                {
+                    "server": "wpskairos.azurecr.io",
+                    "username": "[parameters('registryLogin')]",
+                    "password": "[parameters('registryPassword')]"
+                }
+                ],
+                "restartPolicy": "OnFailure",
+                "ipAddress": {
+                    "ports": [
+                        {
+                            "protocol": "TCP",
+                            "port": 22
+                        }
+                    ],
+                    "ip": "52.224.88.229",
+                    "type": "Public",
+                    "dnsNameLabel": "kairossftp"
+                },
+                "osType": "Linux",
+                "volumes": [
+                    {
+                        "name": "sftpvolume",
+                        "azureFile": {
+                            "shareName": "kairossftp",
+                            "readOnly": false,
+                            "storageAccountName": "kairosdata",
+                            "storageAccountKey": "[parameters('storagePassword')]"
+                        }
+                    }
+                ]
+            }
+        }
+    ]
+}
