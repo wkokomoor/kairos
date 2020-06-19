@@ -20,7 +20,7 @@
         "name": "nifi",
         "type": "Microsoft.ContainerInstance/containerGroups",
         "apiVersion": "2018-10-01",
-        "location": "",
+        "location": "eastus",
         "tags": {},
         "properties": {
             "containers": [
