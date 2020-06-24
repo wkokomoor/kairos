@@ -1,0 +1,83 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "containerGroups_sentiment_name": {
+            "defaultValue": "sentiment",
+            "type": "string"
+        },
+        "registryLogin": {
+            "type": "string"
+        },
+        "registryPassword": {
+            "type": "securestring"
+        },
+        "ApiKey": {
+            "type": "securestring"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.ContainerInstance/containerGroups",
+            "apiVersion": "2018-10-01",
+            "name": "[parameters('containerGroups_sentiment_name')]",
+            "location": "eastus",
+            "properties": {
+                "containers": [
+                    {
+                        "name": "[parameters('containerGroups_sentiment_name')]",
+                        "properties": {
+                            "image": "[concat('wpskairos.azurecr.io/azure-cognitive-services/', parameters('containerGroups_sentiment_name'), ':3.0')]",
+                            "ports": [
+                                {
+                                    "protocol": "TCP",
+                                    "port": 5000
+                                }
+                            ],
+                            "environmentVariables": [
+                                {
+                                    "name": "Eula",
+                                    "value": "accept"
+                                },
+                                {
+                                    "name": "Billing",
+                                    "value": "https://kairostexttest.cognitiveservices.azure.com/"
+                                },
+                                {
+                                    "name": "ApiKey",
+                                    "value": "1d3f8cafac864507916f0d2534aef64b"
+                                }
+                            ],
+                            "resources": {
+                                "requests": {
+                                    "memoryInGB": 4,
+                                    "cpu": 1
+                                }
+                            }
+                        }
+                    }
+                ],
+                "imageRegistryCredentials": [
+                    {
+                        "server": "wpskairos.azurecr.io",
+                        "username": "[parameters('registryLogin')]",
+                        "password": "[parameters('registryPassword')]"
+                    }
+                ],
+                "restartPolicy": "OnFailure",
+                "ipAddress": {
+                    "ports": [
+                        {
+                            "protocol": "TCP",
+                            "port": 5000
+                        }
+                    ],
+                    "type": "Public",
+                    "dnsNameLabel": "[parameters('containerGroups_sentiment_name')]"
+                },
+                "osType": "Linux"
+            }
+        }
+    ]
+}
