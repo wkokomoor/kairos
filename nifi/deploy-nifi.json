@@ -13,6 +13,12 @@
         },
         "registryPassword": {
             "type": "securestring"
+        },
+        "sftpLogin": {
+            "type": "string"
+        },
+        "sftpPassword": {
+            "type": "securestring"
         }
     },
     "variables": {},
@@ -20,12 +26,11 @@
         "name": "nifi",
         "type": "Microsoft.ContainerInstance/containerGroups",
         "apiVersion": "2018-10-01",
-        "location": "eastus",
+        "location": "[resourceGroup().location]",
         "tags": {},
         "properties": {
-            "containers": [
-            {
-                "name": "nifi01",
+            "containers": [{
+                "name": "nifi",
                 "properties": {
                     "image": "wpskairos.azurecr.io/nifi:latest",
                     "command": [],
@@ -40,13 +45,36 @@
                         "requests": {
                             "memoryInGB": 1.5,
                             "cpu": 1
-                        },
-                        "limits": {}
+                        }
                     },
                     "volumeMounts": [
                     {
-                        "name": "nificonf",
-                        "mountPath": "/opt/nifi/nifi-current/conf"
+                        "name": "nificontent",
+                        "mountPath": "/opt/nifi/nifi-current/content_repository"
+                    },
+                    {
+                        "name": "nifidb",
+                        "mountPath": "/opt/nifi/nifi-current/database_repository"
+                    },
+                    {
+                        "name": "nififlow",
+                        "mountPath": "/opt/nifi/nifi-current/flowfile_repository"
+                    },
+                    {
+                        "name": "nifiprov",
+                        "mountPath": "/opt/nifi/nifi-current/provenance_repository"
+                    },
+                    {
+                        "name": "nifilogs",
+                        "mountPath": "/opt/nifi/nifi-current/logs"
+                    },
+                    {
+                        "name": "kairossftp",
+                        "mountPath": "/kairossftp"
+                    },
+                    {
+                        "name": "processed",
+                        "mountPath": "/processed"
                     }
                     ]
                 }
@@ -67,16 +95,65 @@
                     "port": 8080
                 }
                 ],
-                "type": "Public"
+                "type": "Public",
+                "dnsNameLabel": "wpskairosnifi"
                 },
             "osType": "Linux",
             "volumes": [
             {
-                "name": "nificonf",
+                "name": "nificontent",
                 "azureFile": {
-                    "shareName": "nificonf",
+                    "shareName": "nificontent",
                     "storageAccountName": "[parameters('storageLogin')]",
                     "storageAccountKey": "[parameters('storagePassword')]"
+                }
+            },
+            {
+                "name": "nifidb",
+                "azureFile": {
+                    "shareName": "nifidb",
+                    "storageAccountName": "[parameters('storageLogin')]",
+                    "storageAccountKey": "[parameters('storagePassword')]"
+                }
+            },
+            {
+                "name": "nififlow",
+                "azureFile": {
+                    "shareName": "nififlow",
+                    "storageAccountName": "[parameters('storageLogin')]",
+                    "storageAccountKey": "[parameters('storagePassword')]"
+                }
+            },
+            {
+                "name": "nifiprov",
+                "azureFile": {
+                    "shareName": "nifiprov",
+                    "storageAccountName": "[parameters('storageLogin')]",
+                    "storageAccountKey": "[parameters('storagePassword')]"
+                }
+            },
+            {
+                "name": "nifilogs",
+                "azureFile": {
+                    "shareName": "nifilogs",
+                    "storageAccountName": "[parameters('storageLogin')]",
+                    "storageAccountKey": "[parameters('storagePassword')]"
+                }
+            },
+            {
+                "name": "kairossftp",
+                "azureFile": {
+                    "shareName": "kairossftp",
+                    "storageAccountName": "[parameters('sftpLogin')]",
+                    "storageAccountKey": "[parameters('sftpPassword')]"
+                }
+            },
+            {
+                "name": "processed",
+                "azureFile": {
+                    "shareName": "processed",
+                    "storageAccountName": "[parameters('sftpLogin')]",
+                    "storageAccountKey": "[parameters('sftpPassword')]"
                 }
             }
             ]

@@ -3,3 +3,10 @@ az deployment group create \
   --resource-group kairos \
   --template-uri "https://raw.githubusercontent.com/wkokomoor/kairos/master/nifi/deploy-nifi.json" \
   --parameters "deploy-nifi-props.json"
+
+az group create --name nifi --location eastus
+az deployment group create \
+  --resource-group kairos \
+  --template-file "deploy-nifi.json" \
+  --parameters "deploy-nifi-props.json"
+

@@ -2,6 +2,17 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
+        "sftpLogin": {
+            "value": "kairosdata"
+        },
+        "sftpPassword": {
+            "reference": {
+                "keyVault": {
+                    "id": "/subscriptions/092ff917-f085-4b8c-a6a8-c5bb91c39598/resourceGroups/kairos/providers/Microsoft.KeyVault/vaults/kairos"
+                },
+                "secretName": "sftpPassword"
+            }
+        },
         "storageLogin": {
             "value": "kairosappdata"
         },
